@@ -173,10 +173,6 @@ function FormularioLogin() {
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Cuentas de demostración
           </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Deben existir en Firebase Authentication del proyecto; el botón solo rellena el
-            formulario.
-          </p>
           <div className="mt-3 grid gap-2">
             {CUENTAS_DEMO.map((c) => (
               <button

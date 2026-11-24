@@ -11,9 +11,13 @@ import { MensajeError, ErrorCampo } from '@/app/components/Mensajes';
 import BotonGoogle from '@/app/components/BotonGoogle';
 import Cargando from '@/app/components/Cargando';
 
+/**
+ * Solo se publica la cuenta de cliente. Las de administrador y operador se
+ * omiten a propósito: la aplicación está desplegada contra una base de datos
+ * real, y publicar unas credenciales con permisos de escritura sobre la flota
+ * y los contratos equivale a dejar el panel abierto.
+ */
 const CUENTAS_DEMO = [
-  { rol: 'Administrador', email: 'admin@rentsmart.com', password: 'Admin123' },
-  { rol: 'Operador', email: 'operador@rentsmart.com', password: 'Operador123' },
   { rol: 'Cliente', email: 'cliente@rentsmart.com', password: 'Cliente123' },
 ];
 

@@ -22,36 +22,17 @@ const PERIODOS = [
   { clave: 'mes', etiqueta: 'Últimos 30 días' },
 ];
 
-/**
- * Resta meses conservando el día dentro del mes de destino. Sin este ajuste,
- * el 31 de mayo menos tres meses daría el 3 de marzo: JavaScript desborda al
- * mes siguiente los días que no caben en el mes destino.
- */
-function restarMeses(fecha, meses) {
-  const destino = new Date(fecha.getFullYear(), fecha.getMonth() - meses, 1);
-  const ultimoDia = new Date(destino.getFullYear(), destino.getMonth() + 1, 0).getDate();
-  destino.setDate(Math.min(fecha.getDate(), ultimoDia));
-  return destino;
-}
-
-/**
- * Formatea en hora local. toISOString() convierte antes a UTC, y con husos
- * horarios al este de Greenwich eso adelanta la fecha un día.
- */
-function aIso(fecha) {
-  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-  const dia = String(fecha.getDate()).padStart(2, '0');
-  return `${fecha.getFullYear()}-${mes}-${dia}`;
-}
-
 function rangoDe(clave) {
   const hasta = hoyIso();
   const hoy = new Date();
   if (clave === 'mes') return { desde: hoyIso(-30), hasta };
-  if (clave === 'trimestre') return { desde: aIso(restarMeses(hoy, 3)), hasta };
-  if (clave === 'semestre') return { desde: aIso(restarMeses(hoy, 6)), hasta };
-  return { desde: aIso(new Date(hoy.getFullYear(), 0, 1)), hasta };
+  if (clave === 'trimestre')
+    return { desde: new Date(hoy.getFullYear(), hoy.getMonth() - 3, hoy.getDate()).toISOString().slice(0, 10), hasta };
+  if (clave === 'semestre')
+    return { desde: new Date(hoy.getFullYear(), hoy.getMonth() - 6, hoy.getDate()).toISOString().slice(0, 10), hasta };
+  return { desde: new Date(hoy.getFullYear(), 0, 1).toISOString().slice(0, 10), hasta };
 }
+
 function Reportes() {
   const [periodo, setPeriodo] = useState('anio');
   const [rango, setRango] = useState(() => rangoDe('anio'));

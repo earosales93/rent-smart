@@ -19,7 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Navbar />
           <main className="flex flex-1 flex-col">{children}</main>
           <footer className="border-t border-slate-200 bg-white py-5 text-center text-xs text-slate-500">
-            RENT SMART · Universidad Don Bosco · Grupo G
+            RENT SMART · Universidad Don Bosco · Grupo 02T
           </footer>
         </AuthProvider>
       </body>

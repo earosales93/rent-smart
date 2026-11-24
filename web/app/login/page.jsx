@@ -173,7 +173,6 @@ function FormularioLogin() {
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Cuentas de demostración
           </p>
-        
           <div className="mt-3 grid gap-2">
             {CUENTAS_DEMO.map((c) => (
               <button

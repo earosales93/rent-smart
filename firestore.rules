@@ -1,0 +1,117 @@
+rules_version = '2';
+
+// ============================================================================
+//  RENT SMART · Reglas de seguridad de Cloud Firestore
+// ============================================================================
+// Archivo único para las dos plataformas: la aplicación web y la móvil hablan
+// con el mismo proyecto, y por tanto con estas mismas reglas.
+//
+// El control de acceso vive aquí, en el servidor, y no en la aplicación.
+// Aunque alguien modificara el código del cliente —que viaja al navegador y
+// al teléfono, y por tanto se puede inspeccionar y alterar—, estas reglas se
+// siguen aplicando: es la diferencia entre validar y autorizar.
+//
+// Se publican con:
+//     firebase deploy --only firestore:rules
+// o pegándolas en Firestore Database → Reglas en la consola de Firebase.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    function esDueno(uid) {
+      return autenticado() && request.auth.uid == uid;
+    }
+
+    /**
+     * Comprueba el rol en el documento de perfil de quien hace la petición.
+     * El 'exists' previo no es decorativo: sin él, un usuario recién creado
+     * por Google —cuyo perfil aún no se ha escrito— haría fallar la lectura.
+     */
+    function tieneRol(valor) {
+      return autenticado()
+        && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid))
+        && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == valor;
+    }
+
+    function esAdministrador() {
+      return tieneRol('administrador');
+    }
+
+    /** Personal de la arrendadora: administrador y operador de mostrador. */
+    function esPersonal() {
+      return tieneRol('administrador') || tieneRol('operador');
+    }
+
+    // --- Perfiles -----------------------------------------------------------
+    // Cada quien lee y escribe únicamente su propio documento. El campo rol
+    // no se puede elevar desde la aplicación: en una actualización propia
+    // debe conservar el valor que ya tenía, y al crearse solo admite
+    // 'cliente'. Los roles de personal los asigna un administrador.
+    match /usuarios/{uid} {
+      allow read: if esDueno(uid) || esPersonal();
+      allow create: if esDueno(uid) && request.resource.data.rol == 'cliente';
+      allow update: if (esDueno(uid) && request.resource.data.rol == resource.data.rol)
+                    || esAdministrador();
+      allow delete: if false;
+    }
+
+    // --- Catálogo de vehículos ---------------------------------------------
+    // Lectura para cualquier usuario autenticado; el alta y la baja de
+    // unidades son operaciones de administración.
+    match /vehiculos/{id} {
+      allow read: if autenticado();
+      allow write: if esAdministrador();
+    }
+
+    // --- Reservas -----------------------------------------------------------
+    // La lectura está abierta a cualquier usuario autenticado, y conviene
+    // explicar por qué: para saber si un vehículo está libre en unas fechas
+    // hay que poder ver qué fechas están tomadas, y esas fechas están en las
+    // reservas de otras personas. Las reglas de Firestore no permiten
+    // autorizar campos sueltos de un documento, así que o se concede la
+    // lectura completa o el calendario no funciona. La alternativa en un
+    // sistema en producción sería mantener una colección aparte con solo los
+    // rangos ocupados, escrita por una Cloud Function; se documenta como
+    // trabajo futuro porque el plan gratuito del curso no incluye funciones.
+    //
+    // La escritura sí está acotada: el cliente solo crea reservas a su propio
+    // nombre, en estado 'pendiente', y no puede reasignar el dueño después.
+    // El personal de mostrador puede reservar a nombre de un cliente.
+    match /reservas/{id} {
+      allow read: if autenticado();
+      allow create: if (esDueno(request.resource.data.uid) || esPersonal())
+                    && request.resource.data.estado == 'pendiente'
+                    && request.resource.data.total is number
+                    && request.resource.data.total >= 0;
+      allow update: if (esDueno(resource.data.uid)
+                        && request.resource.data.uid == resource.data.uid)
+                    || esPersonal();
+      allow delete: if esAdministrador();  // solo reservas ya canceladas
+    }
+
+    // --- Contratos ----------------------------------------------------------
+    // El identificador del contrato es el de su reserva, lo que hace la
+    // emisión idempotente. El cliente lee el suyo; emitirlo, cerrarlo o
+    // anularlo es competencia del personal.
+    match /contratos/{id} {
+      allow read: if esDueno(resource.data.uid) || esPersonal();
+      allow create: if esPersonal()
+                    && request.resource.data.estado == 'vigente';
+      allow update: if esPersonal();
+      allow delete: if false;   // un contrato se anula, no se borra
+    }
+
+    // --- Bitácora de actividad ---------------------------------------------
+    // Solo se puede añadir y leer lo propio: un registro que se puede editar
+    // no sirve como evidencia de lo ocurrido.
+    match /actividad/{id} {
+      allow read: if esDueno(resource.data.uid) || esPersonal();
+      allow create: if esDueno(request.resource.data.uid) || esPersonal();
+      allow update, delete: if false;
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "//": [
+    "Índices compuestos de Cloud Firestore para RENT SMART.",
+    "",
+    "Firestore crea solo los índices de un campo. En cuanto una consulta",
+    "combina un filtro con una ordenación por otro campo, o dos ordenaciones,",
+    "hace falta declarar el índice: si no existe, la consulta falla con",
+    "'failed-precondition' y la aplicación muestra el aviso de que falta un",
+    "índice. Cada entrada de esta lista corresponde a una consulta concreta",
+    "del código, anotada arriba de ella.",
+    "",
+    "Se publican con:  firebase deploy --only firestore:indexes"
+  ],
+  "indexes": [
+    {
+      "//": "reservas de un cliente — ReservaService.obtenerReservas({ uid })",
+      "collectionGroup": "reservas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "fechaInicio", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "reservas de un cliente filtradas por estado — app móvil",
+      "collectionGroup": "reservas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "fechaInicio", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "reservas de una unidad — detalle del vehículo",
+      "collectionGroup": "reservas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "vehiculoId", "order": "ASCENDING" },
+        { "fieldPath": "fechaInicio", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "reservas por estado — pantalla de gestión del mostrador",
+      "collectionGroup": "reservas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "fechaInicio", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "verificación de traslape y baja de unidades — vehiculoId + estado in",
+      "collectionGroup": "reservas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "vehiculoId", "order": "ASCENDING" },
+        { "fieldPath": "estado", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "catálogo ordenado por marca y modelo — dos ordenaciones",
+      "collectionGroup": "vehiculos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "marca", "order": "ASCENDING" },
+        { "fieldPath": "modelo", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "catálogo filtrado por estado",
+      "collectionGroup": "vehiculos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "marca", "order": "ASCENDING" },
+        { "fieldPath": "modelo", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "catálogo filtrado por categoría",
+      "collectionGroup": "vehiculos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "categoria", "order": "ASCENDING" },
+        { "fieldPath": "marca", "order": "ASCENDING" },
+        { "fieldPath": "modelo", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "catálogo filtrado por estado y categoría a la vez",
+      "collectionGroup": "vehiculos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "categoria", "order": "ASCENDING" },
+        { "fieldPath": "marca", "order": "ASCENDING" },
+        { "fieldPath": "modelo", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "unidades disponibles por categoría — búsqueda por fechas",
+      "collectionGroup": "vehiculos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "categoria", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "unidades disponibles ordenadas por precio — inicio de la app móvil",
+      "collectionGroup": "vehiculos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "precioPorDia", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "contratos de un cliente — portal del cliente",
+      "collectionGroup": "contratos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "fechaEmision", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "contratos por estado — pantalla de contratos",
+      "collectionGroup": "contratos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "fechaEmision", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "contratos por estado y cliente",
+      "collectionGroup": "contratos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estado", "order": "ASCENDING" },
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "fechaEmision", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "bitácora de un usuario — historial",
+      "collectionGroup": "actividad",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uid", "order": "ASCENDING" },
+        { "fieldPath": "creadoEn", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "clientes filtrados por rol — panel de administración",
+      "collectionGroup": "usuarios",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "rol", "order": "ASCENDING" },
+        { "fieldPath": "nombre", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

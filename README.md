@@ -11,6 +11,12 @@
 Universidad Don Bosco · Diseño y Programación de Software Multiplataforma · Grupo 02T
 **Entrega final — Ciclo 02/2026**
 
+### 🔗 Aplicación web desplegada: **https://rent-smart-l6qx.vercel.app**
+
+Para probarla, la cuenta de demostración de cliente aparece en la propia
+portada. Las credenciales de administrador y de operador no se publican: el
+sitio opera contra una base de datos real.
+
 ---
 
 RENT SMART digitaliza la operación de una arrendadora de vehículos: el
@@ -68,6 +74,7 @@ porque ambas hablan con el mismo proyecto de Firebase.
 | Una sola base de datos para las dos plataformas | Mismo proyecto de Firebase; las cinco colecciones son compartidas |
 | Navegación entre pantallas | `expo-router` en móvil · App Router de Next.js en web |
 | Reglas de seguridad del lado del servidor | [`firestore.rules`](firestore.rules) |
+| Índices de las consultas | [`firestore.indexes.json`](firestore.indexes.json) |
 | Pruebas automatizadas | 105 pruebas de Jest — [`mobile/PRUEBAS.md`](mobile/PRUEBAS.md) |
 | Licencia abierta | [`LICENSE`](LICENSE) — Creative Commons BY-NC-SA 4.0 |
 | Documentación | este README, [`web/README.md`](web/README.md), [`mobile/README.md`](mobile/README.md) |
@@ -91,7 +98,8 @@ rent-smart/
 ├── README.md                 Este archivo
 ├── LICENSE                   Creative Commons BY-NC-SA 4.0
 ├── firestore.rules           Reglas de seguridad (las dos plataformas)
-├── firebase.json             Para 'firebase deploy --only firestore:rules'
+├── firestore.indexes.json    Índices compuestos que exigen las consultas
+├── firebase.json             Para 'firebase deploy'
 ├── .gitignore
 │
 ├── web/                      Aplicación web — panel y portal del cliente
@@ -133,6 +141,14 @@ Un solo proyecto sirve a las dos aplicaciones. Se hace una vez.
 → *Agregar proyecto*. Nombre sugerido: `rent-smart-udb`. Google Analytics no es
 necesario.
 
+> El proyecto **todavía no existe**: lo crea el equipo con la cuenta de Google
+> de quien lo vaya a administrar, y a partir de ahí es suyo. El identificador
+> es único en todo Firebase, así que si `rent-smart-udb` ya está tomado la
+> consola añadirá un sufijo (`rent-smart-udb-4f2a1`, por ejemplo) y ese será el
+> que haya que usar en los archivos `.env`. El dominio
+> `<identificador>.firebaseapp.com` lo genera Google automáticamente; no se
+> compra ni se configura.
+
 **2. Habilitar los proveedores de acceso.** *Authentication* → *Comenzar* →
 pestaña *Sign-in method*:
 
@@ -144,15 +160,24 @@ modo **producción** → región `us-central1` (o la más cercana). El modo
 producción deniega todo por defecto; el paso siguiente abre exactamente lo
 necesario.
 
-**4. Publicar las reglas.** Pestaña *Reglas*: pegar el contenido de
-[`firestore.rules`](firestore.rules) y *Publicar*. O, con la CLI:
+**4. Publicar las reglas y los índices.** Las reglas se pueden pegar a mano en
+la pestaña *Reglas*, pero los índices no: conviene usar la CLI, que publica
+ambas cosas desde los archivos del repositorio.
 
 ```bash
 npm i -g firebase-tools
 firebase login
 firebase use --add            # elegir el proyecto
-firebase deploy --only firestore:rules
+firebase deploy --only firestore:rules,firestore:indexes
 ```
+
+Los índices tardan unos minutos en construirse; el progreso se ve en
+*Firestore → Índices*. **No son opcionales.** Firestore los exige por la forma
+de la consulta —un filtro combinado con una ordenación por otro campo, o dos
+ordenaciones— y no por la cantidad de datos: sin ellos, la pantalla falla desde
+el primer documento con el aviso de que falta un índice. Los dieciséis que el
+proyecto necesita están declarados, con su consulta anotada, en
+[`firestore.indexes.json`](firestore.indexes.json).
 
 **5. Registrar las aplicaciones.** *Configuración del proyecto* → *Tus
 aplicaciones*:
@@ -332,7 +357,13 @@ error real encontró cada una, está en [`mobile/PRUEBAS.md`](mobile/PRUEBAS.md)
 
 ## 9. Despliegue
 
-**Web — Vercel.**
+**Web — Vercel.** Desplegada en **https://rent-smart-l6qx.vercel.app**, conectada
+a este repositorio: cada `push` a `main` publica una versión nueva, y cada rama
+abre su propia vista previa.
+
+El proyecto es un monorepo, así que en Vercel hay que fijar **Root Directory =
+`web`**; dejarlo en la raíz hace fallar la compilación porque ahí no hay
+`package.json`.
 
 ```bash
 cd web
@@ -364,15 +395,17 @@ para la demostración en clase.
 El trabajo se dividió en cinco partes, una por integrante, cada una en su propia
 rama. Las ramas se integran a `main` por *pull request*.
 
-| Rama | Parte | Integrante |
-| --- | --- | --- |
-| `parte-1-base-y-firebase` | Estructura del repositorio, configuración de Firebase, reglas de seguridad, licencia y documentación | |
-| `parte-2-autenticacion` | Authentication con correo y Google, perfiles en Firestore, contexto de sesión, rutas protegidas | |
-| `parte-3-catalogo-vehiculos` | Catálogo, disponibilidad por fechas, alta, edición y estados de las unidades | |
-| `parte-4-reservas` | Reservas, cotización, máquina de estados, historial y bitácora de actividad | |
-| `parte-5-contratos-y-reportes` | Emisión de contratos, documento imprimible, reportes e indicadores | |
+| Rama | Parte | Integrante | Carné |
+| --- | --- | --- | --- |
+| `parte-1-base-y-firebase` | Estructura del repositorio, configuración de Firebase, reglas de seguridad, licencia y documentación | Carías Aguilar, Elmer Enrique | CA230419 |
+| `parte-2-autenticacion` | Authentication con correo y Google, perfiles en Firestore, contexto de sesión, rutas protegidas | Guzmán Ayala, Sophia Marcela | GA231577 |
+| `parte-3-catalogo-vehiculos` | Catálogo, disponibilidad por fechas, alta, edición y estados de las unidades | Martínez Nolasco, Julio César | MN240828 |
+| `parte-4-reservas` | Reservas, cotización, máquina de estados, historial y bitácora de actividad | Rivas Ramírez, Marilyn Yajaira | RR232545 |
+| `parte-5-contratos-y-reportes` | Emisión de contratos, documento imprimible, reportes e indicadores | Rosales López, Erick Arístides | RL120548 |
 
-> Completar la columna de integrantes antes de entregar.
+La división sigue los módulos del sistema, no un reparto arbitrario de
+archivos: por eso las ramas 2 a 5 no comparten ningún archivo entre sí y se
+integran sin conflictos.
 
 Cada parte se entrega como un ZIP aparte, con sus archivos y el mensaje de
 commit sugerido, de modo que cada integrante haga su propio commit en su rama.

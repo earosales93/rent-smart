@@ -101,12 +101,7 @@ export default function Inicio() {
                 cliente@rentsmart.com / Cliente123
               </li>
             </ul>
-            <p className="mt-3 text-xs leading-relaxed text-blue-800">
-              Las cuentas de administrador y de operador no se publican: el sitio está
-              desplegado contra una base de datos real, y cualquiera con la dirección
-              podría modificar la flota o los contratos. Se facilitan al docente durante
-              la defensa.
-            </p>
+       
           </div>
         )}
       </section>

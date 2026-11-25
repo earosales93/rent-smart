@@ -11,6 +11,12 @@
 Universidad Don Bosco · Diseño y Programación de Software Multiplataforma · Grupo 02T
 **Entrega final — Ciclo 02/2026**
 
+### 🔗 Aplicación web desplegada: **https://rent-smart-l6qx.vercel.app**
+
+Para probarla, la cuenta de demostración de cliente aparece en la propia
+portada. Las credenciales de administrador y de operador no se publican: el
+sitio opera contra una base de datos real.
+
 ---
 
 RENT SMART digitaliza la operación de una arrendadora de vehículos: el
@@ -351,7 +357,13 @@ error real encontró cada una, está en [`mobile/PRUEBAS.md`](mobile/PRUEBAS.md)
 
 ## 9. Despliegue
 
-**Web — Vercel.**
+**Web — Vercel.** Desplegada en **https://rent-smart-l6qx.vercel.app**, conectada
+a este repositorio: cada `push` a `main` publica una versión nueva, y cada rama
+abre su propia vista previa.
+
+El proyecto es un monorepo, así que en Vercel hay que fijar **Root Directory =
+`web`**; dejarlo en la raíz hace fallar la compilación porque ahí no hay
+`package.json`.
 
 ```bash
 cd web

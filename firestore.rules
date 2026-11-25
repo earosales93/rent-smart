@@ -11,7 +11,7 @@ rules_version = '2';
 // al teléfono, y por tanto se puede inspeccionar y alterar—, estas reglas se
 // siguen aplicando: es la diferencia entre validar y autorizar.
 //
-// Se publican con: 
+// Se publican con:
 //     firebase deploy --only firestore:rules
 // o pegándolas en Firestore Database → Reglas en la consola de Firebase.
 
